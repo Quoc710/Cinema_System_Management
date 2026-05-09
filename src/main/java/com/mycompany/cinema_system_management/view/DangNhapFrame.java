@@ -1,17 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.cinema_system_management.view;
 
-/**
- *
- * @author Dell
- */
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.mycompany.cinema_system_management.dao.TaiKhoanDAO;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -25,137 +16,176 @@ public class DangNhapFrame extends JFrame {
     private JButton btnDangNhap;
 
     public DangNhapFrame() {
-        // 1. Khởi tạo FlatLaf
         FlatLightLaf.setup();
-        
         setTitle("Cinema Enterprise - Đăng nhập");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 500); // Form đăng nhập ngắn hơn form đăng ký
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setMinimumSize(new Dimension(1000, 700));
         setLocationRelativeTo(null);
-        
-        // Panel chính
-        JPanel mainPanel = new JPanel();
-        mainPanel.setBackground(Color.WHITE);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(new EmptyBorder(40, 40, 40, 40));
-        setContentPane(mainPanel);
 
-        // --- GIAO DIỆN ---
-        
-        // Tiêu đề
+        JPanel basePanel = new JPanel(new GridLayout(1, 2));
+        basePanel.setBackground(Color.WHITE);
+
+        JPanel imagePanel = new JPanel(new BorderLayout());
+        imagePanel.setBackground(new Color(241, 245, 249));
+
+        JLabel lblImage = new JLabel();
+        lblImage.setHorizontalAlignment(SwingConstants.CENTER);
+        try {
+            java.net.URL imgUrl = getClass().getResource("/images/manhinnregister.jpg");
+            if (imgUrl != null) {
+                ImageIcon icon = new ImageIcon(new ImageIcon(imgUrl).getImage().getScaledInstance(800, 1000, Image.SCALE_SMOOTH));
+                lblImage.setIcon(icon);
+            }
+        } catch (Exception e) {}
+        imagePanel.add(lblImage, BorderLayout.CENTER);
+
+        JPanel formWrapper = new JPanel(new GridBagLayout());
+        formWrapper.setBackground(Color.WHITE);
+
+        JPanel innerFormPanel = new JPanel();
+        innerFormPanel.setBackground(Color.WHITE);
+        innerFormPanel.setLayout(new BoxLayout(innerFormPanel, BoxLayout.Y_AXIS));
+        innerFormPanel.setPreferredSize(new Dimension(400, 450));
+        innerFormPanel.setMaximumSize(new Dimension(400, 450));
+
         JLabel lblHeader = new JLabel("Đăng nhập");
-        lblHeader.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblHeader.setFont(new Font("Segoe UI", Font.BOLD, 36));
         lblHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(lblHeader);
-        
+        innerFormPanel.add(lblHeader);
+        innerFormPanel.add(Box.createVerticalStrut(10));
+
         JLabel lblSub = new JLabel("Chào mừng bạn trở lại với hệ thống quản lý vé phim.");
-        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         lblSub.setForeground(Color.GRAY);
         lblSub.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(lblSub);
-        mainPanel.add(Box.createVerticalStrut(30));
+        innerFormPanel.add(lblSub);
+        innerFormPanel.add(Box.createVerticalStrut(40));
 
-        // Ô nhập Tên đăng nhập (Trong DB mình xài Username nên tui để label là Tên đăng nhập cho chuẩn)
-        mainPanel.add(createLabel("Tên đăng nhập"));
-        txtUsername = new JTextField();
-        txtUsername.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Nhập username...");
-        txtUsername.putClientProperty(FlatClientProperties.STYLE, "arc: 10; padding: 5,10,5,10");
-        txtUsername.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        mainPanel.add(txtUsername);
-        mainPanel.add(Box.createVerticalStrut(15));
+        innerFormPanel.add(createLabel("Tên đăng nhập"));
+        txtUsername = createStyledTextField("Nhập username...");
+        innerFormPanel.add(txtUsername);
+        innerFormPanel.add(Box.createVerticalStrut(20));
 
-        // Ô nhập Mật khẩu
         JPanel passHeaderPanel = new JPanel(new BorderLayout());
         passHeaderPanel.setBackground(Color.WHITE);
-        passHeaderPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-        passHeaderPanel.add(createLabel("Mật khẩu"), BorderLayout.WEST);
+        passHeaderPanel.setMaximumSize(new Dimension(400, 25));
+        passHeaderPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        JLabel lblPass = new JLabel("Mật khẩu");
+        lblPass.setFont(new Font("Segoe UI", Font.BOLD, 13));
         
         JLabel lblForgot = new JLabel("<html><font color='#023E8A'>Quên mật khẩu?</font></html>");
-        lblForgot.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblForgot.setFont(new Font("Segoe UI", Font.BOLD, 13));
         lblForgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        passHeaderPanel.add(lblPass, BorderLayout.WEST);
         passHeaderPanel.add(lblForgot, BorderLayout.EAST);
-        mainPanel.add(passHeaderPanel);
+        innerFormPanel.add(passHeaderPanel);
 
-        txtPassword = new JPasswordField();
-        txtPassword.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "********");
-        txtPassword.putClientProperty(FlatClientProperties.STYLE, "arc: 10; padding: 5,10,5,10");
-        txtPassword.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        mainPanel.add(txtPassword);
-        mainPanel.add(Box.createVerticalStrut(10));
+        txtPassword = createStyledPasswordField();
+        innerFormPanel.add(txtPassword);
+        innerFormPanel.add(Box.createVerticalStrut(35));
 
-        // Checkbox Ghi nhớ
-        JCheckBox chkRemember = new JCheckBox("Ghi nhớ đăng nhập");
-        chkRemember.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        chkRemember.setBackground(Color.WHITE);
-        mainPanel.add(chkRemember);
-        mainPanel.add(Box.createVerticalStrut(25));
-
-        // Nút Đăng nhập
         btnDangNhap = new JButton("Đăng nhập →");
-        btnDangNhap.setBackground(new Color(2, 62, 138)); // Xanh Navy
+        btnDangNhap.setBackground(new Color(2, 62, 138));
         btnDangNhap.setForeground(Color.WHITE);
-        btnDangNhap.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnDangNhap.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        btnDangNhap.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        btnDangNhap.setMaximumSize(new Dimension(400, 45));
         btnDangNhap.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnDangNhap.putClientProperty(FlatClientProperties.STYLE, "arc: 15");
-        btnDangNhap.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(btnDangNhap);
+        btnDangNhap.setAlignmentX(Component.LEFT_ALIGNMENT);
+        innerFormPanel.add(btnDangNhap);
 
-        // Link chuyển sang Đăng ký
-        mainPanel.add(Box.createVerticalStrut(20));
-        JLabel lblRegisterLink = new JLabel("<html>Chưa có tài khoản? <font color='#023E8A'><b>Đăng ký ngay</b></font></html>");
-        lblRegisterLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        lblRegisterLink.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(lblRegisterLink);
+        innerFormPanel.add(Box.createVerticalStrut(25));
 
-        // --- XỬ LÝ SỰ KIỆN ---
+        JLabel lblSignup = new JLabel("<html>Chưa có tài khoản? <font color='#023E8A'><b>Đăng ký ngay</b></font></html>");
+        lblSignup.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblSignup.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        lblSignup.setAlignmentX(Component.LEFT_ALIGNMENT);
+        innerFormPanel.add(lblSignup);
 
-        // 1. Click nút Đăng Nhập -> Gọi Oracle
+        formWrapper.add(innerFormPanel);
+
+        basePanel.add(imagePanel);
+        basePanel.add(formWrapper);
+        setContentPane(basePanel);
+
         btnDangNhap.addActionListener(e -> xuLyDangNhap());
 
-        // 2. Click chữ "Đăng ký ngay" -> Mở form Đăng ký
-        lblRegisterLink.addMouseListener(new MouseAdapter() {
+        lblSignup.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                dispose(); // Đóng form Đăng Nhập
-                new DangKyFrame().setVisible(true); // Mở form Đăng Ký
+                dispose();
+                new DangKyFrame().setVisible(true);
             }
         });
     }
 
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        label.setBorder(new EmptyBorder(5, 0, 5, 0));
+        label.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        label.setBorder(new EmptyBorder(8, 0, 4, 0));
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
         return label;
     }
 
-    private void xuLyDangNhap() {
-    String user = txtUsername.getText();
-    String pass = new String(txtPassword.getPassword());
-
-    if (user.isEmpty() || pass.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Vui lòng nhập đủ thông tin!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
-        return;
+    private JTextField createStyledTextField(String placeholder) {
+        JTextField field = new JTextField();
+        field.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, placeholder);
+        field.putClientProperty(FlatClientProperties.STYLE, "arc: 10; padding: 5,10,5,10");
+        field.setMaximumSize(new Dimension(400, 45));
+        field.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return field;
     }
 
-    TaiKhoanDAO dao = new TaiKhoanDAO();
-    int vaiTro = dao.kiemTraDangNhap(user, pass);
+    private JPasswordField createStyledPasswordField() {
+        JPasswordField field = new JPasswordField();
+        field.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "********");
+        field.putClientProperty(FlatClientProperties.STYLE, "arc: 10; padding: 5,10,5,10");
+        field.setMaximumSize(new Dimension(400, 45));
+        field.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return field;
+    }
 
+    private void xuLyDangNhap() {
+        String user = txtUsername.getText();
+        String pass = new String(txtPassword.getPassword());
+
+        if (user.isEmpty() || pass.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đủ thông tin!", "Nhắc nhở", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        TaiKhoanDAO dao = new TaiKhoanDAO();
+        int vaiTro = dao.kiemTraDangNhap(user, pass);
+
+        // Trong file DangNhapFrame.java, hàm xuLyDangNhap()
     if (vaiTro == 1) {
+        JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
         dispose();
-        new CustomerHome().setVisible(true);
-//    } else if (vaiTro == 2 || vaiTro == 3)  {
-//        dispose();
-//        new AdminDashboard().setVisible(true);
-    // }
+        // Truyền username từ ô nhập liệu vào đây
+        new CustomerHome(txtUsername.getText()).setVisible(true); 
     }
     else {
-        JOptionPane.showMessageDialog(this, "Sai tên đăng nhập hoặc mật khẩu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Sai tên đăng nhập hoặc mật khẩu!", "Lỗi truy cập", JOptionPane.ERROR_MESSAGE);
+        }
     }
-}
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new DangNhapFrame().setVisible(true));
+        // 1. Dán 3 dòng làm mịn và set Font vào ĐÂY, NGAY DÒNG ĐẦU TIÊN
+    System.setProperty("awt.useSystemAAFontSettings", "on");
+    System.setProperty("swing.aatext", "true");
+    UIManager.put("defaultFont", new Font("Segoe UI", Font.PLAIN, 14));
+
+    // 2. Sau đó mới gọi FlatLaf (nếu có)
+    com.formdev.flatlaf.FlatLightLaf.setup();
+
+    // 3. Cuối cùng mới là code mở màn hình của Java
+    java.awt.EventQueue.invokeLater(new Runnable() {
+        public void run() {
+            new DangNhapFrame().setVisible(true);
+        }
+    });
     }
 }

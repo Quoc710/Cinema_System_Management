@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaiKhoanDAO {
 
@@ -81,5 +83,66 @@ public class TaiKhoanDAO {
             e.printStackTrace();
         }
         return maVaiTro;
+    }
+        public List<Object[]> getDanhSachVeCuaKhachHang(String username) {
+    List<Object[]> list = new ArrayList<>();
+    String sql = "SELECT p.TENPHIM, p.HINHANH, lc.TGCHIEU, pc.TENPHONG, g.TENGHE, v.GIAVE " +
+                 "FROM TAIKHOAN tk " +
+                 "JOIN KHACHHANG kh ON tk.MATK = kh.MATK " +
+                 "JOIN VE v ON kh.MAKH = v.MAKHACHHANG " +
+                 "JOIN LICHCHIEU lc ON v.MALICHCHIEU = lc.MALICHCHIEU " +
+                 "JOIN PHIM p ON lc.MAPHIM = p.MAPHIM " +
+                 "JOIN GHENGOI g ON v.MAGHE = g.MAGHE " +
+                 "JOIN PHONGCHIEU pc ON lc.MAPHONG = pc.MAPHONG " +
+                 "WHERE tk.USERNAME = ?";
+    
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        ps.setString(1, username);
+        ResultSet rs = ps.executeQuery();
+        
+        while (rs.next()) {
+            Object[] movieInfo = new Object[]{rs.getString("TENPHIM"), rs.getString("HINHANH")};
+            String showtime = rs.getString("TGCHIEU") + " | " + rs.getString("TENPHONG");
+            String seat = rs.getString("TENGHE");
+            String price = String.format("%,.0f đ", rs.getDouble("GIAVE"));
+            
+            list.add(new Object[]{movieInfo, showtime, seat, price, ""});
+        }
+        // Dòng này để ní check xem Java có thấy vé nào không
+        System.out.println("DEBUG DAO: Username '" + username + "' co " + list.size() + " ve.");
+        
+    } catch (Exception e) {
+        System.out.println("DEBUG DAO LỖI: " + e.getMessage());
+        e.printStackTrace();
+    }
+    return list;
+}
+        public List<Object[]> getVeDaMua(String username) {
+        List<Object[]> dsVe = new ArrayList<>();
+        String sql = "SELECT p.TENPHIM, p.HINHANH, lc.TGCHIEU, lc.MAPHONG, g.TENGHE, v.GIAVE " +
+                 "FROM KHACHHANG kh " +
+                 "JOIN VE v ON kh.MAKH = v.MAKHACHHANG " +
+                 "JOIN LICHCHIEU lc ON v.MALICHCHIEU = lc.MALICHCHIEU " +
+                 "JOIN PHIM p ON lc.MAPHIM = p.MAPHIM " +
+                 "JOIN GHE g ON v.MAGHE = g.MAGHE " +
+                 "JOIN PHONGCHIEU pc ON lc.MAPHONG = pc.MAPHONG " +
+                 "WHERE kh.USERNAME = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                dsVe.add(new Object[]{
+                    new Object[]{rs.getString("TENPHIM"), rs.getString("HINHANH")}, // Cột 0 (Object mảng)
+                    rs.getString("TGCHIEU") + " | Phòng " + rs.getString("MAPHONG"), // Cột 1
+                    rs.getString("TENGHE"),                                         // Cột 2
+                    String.format("%,.0f đ", rs.getDouble("GIAVE")),               // Cột 3
+                    "" // Cột trạng thái (Để Renderer tự check ngày)
+                });
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return dsVe;
     }
 }

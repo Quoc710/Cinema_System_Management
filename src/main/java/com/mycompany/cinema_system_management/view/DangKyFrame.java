@@ -16,104 +16,144 @@ public class DangKyFrame extends JFrame {
     private JButton btnDangKy;
 
     public DangKyFrame() {
-        // 1. Khởi tạo FlatLaf
         FlatLightLaf.setup();
         
         setTitle("Cinema Enterprise - Đăng ký");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(450, 720);
+        
+        // --- MỞ RỘNG FULL MÀN HÌNH MẶC ĐỊNH ---
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // Phóng to toàn màn hình
+        setMinimumSize(new Dimension(1000, 700)); // Kích thước tối thiểu để không vỡ form
         setLocationRelativeTo(null);
         
-        JPanel mainPanel = new JPanel();
-        mainPanel.setBackground(Color.WHITE);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(new EmptyBorder(30, 40, 30, 40));
-        setContentPane(mainPanel);
+        // Container chính chia 2 cột bằng nhau
+        JPanel basePanel = new JPanel(new GridLayout(1, 2));
+        basePanel.setBackground(Color.WHITE);
 
-        // --- GIAO DIỆN ---
+        // ==========================================
+        // CỘT TRÁI: HÌNH ẢNH BANNER
+        // ==========================================
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.setBackground(new Color(241, 245, 249)); 
+
+        JLabel lblImage = new JLabel();
+        lblImage.setHorizontalAlignment(SwingConstants.CENTER);
         
+        try {
+            java.net.URL imgUrl = getClass().getResource("/images/manhinnregister.jpg");
+            if (imgUrl != null) {
+                // Tăng scale để ảnh nét hơn khi full màn hình
+                ImageIcon icon = new ImageIcon(new ImageIcon(imgUrl).getImage().getScaledInstance(800, 1000, Image.SCALE_SMOOTH));
+                lblImage.setIcon(icon);
+            }
+        } catch (Exception e) {}
+
+        leftPanel.add(lblImage, BorderLayout.CENTER);
+
+        // ==========================================
+        // CỘT PHẢI: FORM ĐĂNG KÝ (ĐÃ CANH GIỮA VÀ KHÓA KÍCH THƯỚC)
+        // ==========================================
+        // Dùng GridBagLayout làm Wrapper để luôn giữ form ở chính giữa vùng trắng
+        JPanel rightWrapper = new JPanel(new GridBagLayout());
+        rightWrapper.setBackground(Color.WHITE);
+
+        JPanel rightPanel = new JPanel();
+        rightPanel.setBackground(Color.WHITE);
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        // Ép cứng độ rộng form là 400px để nó không bị phình to khi full màn hình
+        rightPanel.setPreferredSize(new Dimension(400, 650)); 
+        rightPanel.setMaximumSize(new Dimension(400, 650));
+
         // Brand Header
         JLabel lblBrand = new JLabel("CINEMA ENTERPRISE");
         lblBrand.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        lblBrand.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblBrand.setAlignmentX(Component.LEFT_ALIGNMENT); // Ép canh trái toàn bộ
         lblBrand.setForeground(new Color(2, 62, 138));
-        mainPanel.add(lblBrand);
-        mainPanel.add(Box.createVerticalStrut(25));
+        rightPanel.add(lblBrand);
+        rightPanel.add(Box.createVerticalStrut(25));
 
         // Header Title
         JLabel lblHeader = new JLabel("Tạo tài khoản mới");
-        lblHeader.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        lblHeader.setFont(new Font("Segoe UI", Font.BOLD, 26));
         lblHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(lblHeader);
-        mainPanel.add(Box.createVerticalStrut(15));
+        rightPanel.add(lblHeader);
+        rightPanel.add(Box.createVerticalStrut(20));
 
         // Các ô nhập liệu
-        mainPanel.add(createLabel("Họ và tên"));
+        rightPanel.add(createLabel("Họ và tên"));
         txtHoTen = createStyledTextField("Nguyễn Anh Quốc");
-        mainPanel.add(txtHoTen);
+        rightPanel.add(txtHoTen);
         
-        mainPanel.add(createLabel("Tên đăng nhập"));
+        rightPanel.add(createLabel("Tên đăng nhập"));
         txtUsername = createStyledTextField("quocuit2026");
-        mainPanel.add(txtUsername);
+        rightPanel.add(txtUsername);
 
-        mainPanel.add(createLabel("Email"));
+        rightPanel.add(createLabel("Email"));
         txtEmail = createStyledTextField("quoc@uit.edu.vn");
-        mainPanel.add(txtEmail);
+        rightPanel.add(txtEmail);
 
-        mainPanel.add(createLabel("Số điện thoại"));
+        rightPanel.add(createLabel("Số điện thoại"));
         txtSdt = createStyledTextField("090xxxxxxx");
-        mainPanel.add(txtSdt);
+        rightPanel.add(txtSdt);
 
-        mainPanel.add(createLabel("Mật khẩu"));
+        rightPanel.add(createLabel("Mật khẩu"));
         txtPassword = createStyledPasswordField();
-        mainPanel.add(txtPassword);
+        rightPanel.add(txtPassword);
 
-        mainPanel.add(createLabel("Xác nhận mật khẩu"));
+        rightPanel.add(createLabel("Xác nhận mật khẩu"));
         txtXacNhan = createStyledPasswordField();
-        mainPanel.add(txtXacNhan);
+        rightPanel.add(txtXacNhan);
         
-        mainPanel.add(Box.createVerticalStrut(20));
+        rightPanel.add(Box.createVerticalStrut(25));
 
         // Nút Đăng ký
         btnDangKy = new JButton("Đăng ký tài khoản →");
         btnDangKy.setBackground(new Color(2, 62, 138));
         btnDangKy.setForeground(Color.WHITE);
-        btnDangKy.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnDangKy.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        btnDangKy.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        btnDangKy.setMaximumSize(new Dimension(400, 45)); // Khóa chiều rộng theo form
         btnDangKy.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnDangKy.putClientProperty(FlatClientProperties.STYLE, "arc: 15");
-        btnDangKy.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(btnDangKy);
+        btnDangKy.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rightPanel.add(btnDangKy);
 
-        // --- PHẦN QUAY LẠI ĐĂNG NHẬP (MỚI THÊM) ---
-        mainPanel.add(Box.createVerticalStrut(15));
+        // Phần chuyển hướng Đăng nhập
+        rightPanel.add(Box.createVerticalStrut(20));
         
         JLabel lblBackToLogin = new JLabel("<html>Đã có tài khoản? <font color='#023E8A'><b>Đăng nhập ngay</b></font></html>");
-        lblBackToLogin.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        lblBackToLogin.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblBackToLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        lblBackToLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(lblBackToLogin);
+        lblBackToLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rightPanel.add(lblBackToLogin);
 
-        // --- XỬ LÝ SỰ KIỆN ---
+        // Nhúng Form vào Wrapper để canh giữa
+        rightWrapper.add(rightPanel);
 
-        // 1. Click nút Đăng ký
+        // ==========================================
+        // TÍCH HỢP 2 CỘT VÀO CONTAINER CHÍNH
+        // ==========================================
+        basePanel.add(leftPanel);
+        basePanel.add(rightWrapper);
+        setContentPane(basePanel);
+
+        // Xử lý sự kiện
         btnDangKy.addActionListener(e -> xuLyDangKy());
 
-        // 2. Click dòng chữ Quay lại Đăng nhập
         lblBackToLogin.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                dispose(); // Đóng form hiện tại
-                new DangNhapFrame().setVisible(true); // Mở lại form Đăng nhập
+                dispose(); 
+                new DangNhapFrame().setVisible(true); 
             }
         });
     }
 
-    // Các hàm trợ giúp thiết kế (Giữ nguyên như cũ)
+    // --- CÁC HÀM TRỢ GIÚP (Đã chỉnh ép khung canh trái) ---
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        label.setFont(new Font("Segoe UI", Font.BOLD, 13));
         label.setBorder(new EmptyBorder(8, 0, 4, 0));
+        label.setAlignmentX(Component.LEFT_ALIGNMENT); // Canh trái đồng bộ
         return label;
     }
 
@@ -121,7 +161,8 @@ public class DangKyFrame extends JFrame {
         JTextField field = new JTextField();
         field.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, placeholder);
         field.putClientProperty(FlatClientProperties.STYLE, "arc: 10; padding: 5,10,5,10");
-        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+        field.setMaximumSize(new Dimension(400, 40)); // Khóa cứng chiều rộng 400px
+        field.setAlignmentX(Component.LEFT_ALIGNMENT);
         return field;
     }
 
@@ -129,7 +170,8 @@ public class DangKyFrame extends JFrame {
         JPasswordField field = new JPasswordField();
         field.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "********");
         field.putClientProperty(FlatClientProperties.STYLE, "arc: 10; padding: 5,10,5,10");
-        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+        field.setMaximumSize(new Dimension(400, 40)); // Khóa cứng chiều rộng 400px
+        field.setAlignmentX(Component.LEFT_ALIGNMENT);
         return field;
     }
 

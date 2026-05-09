@@ -11,30 +11,72 @@ import java.io.IOException;
 import java.net.URL;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.util.List;
 
 public class CustomerHome extends JFrame {
 
-    public CustomerHome() {
+    private String currentUsername;
+    private JTextField txtSearch;
+    private JPanel movieGrid; 
+    private List<Phim> dsPhimKhoGoc;
+
+    public CustomerHome(String username) {
+        this.currentUsername = username;
         FlatLightLaf.setup();
         setTitle("CineMarket - Trang chủ");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 750);
+        
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setMinimumSize(new Dimension(1000, 750));
         setLocationRelativeTo(null);
         
-        JPanel mainContent = new JPanel();
-        mainContent.setLayout(new BoxLayout(mainContent, BoxLayout.Y_AXIS));
-        mainContent.setBackground(new Color(248, 250, 252));
-        
-        JScrollPane scrollPane = new JScrollPane(mainContent);
-        scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        setContentPane(scrollPane);
+        PhimDAO phimDao = new PhimDAO();
+        dsPhimKhoGoc = phimDao.getDanhSachPhim();
 
-        mainContent.add(createNavbar());
-        mainContent.add(createHeroBanner());
-        mainContent.add(createMoviesSection());
+        JPanel mainContainer = new JPanel(new BorderLayout());
+        mainContainer.setBackground(new Color(248, 250, 252));
+        
+        JPanel fixedTopPanel = new JPanel();
+        fixedTopPanel.setLayout(new BoxLayout(fixedTopPanel, BoxLayout.Y_AXIS));
+        fixedTopPanel.setBackground(new Color(248, 250, 252));
+        
+        fixedTopPanel.add(createNavbar());
+        fixedTopPanel.add(createHeroBanner());
+        
+        mainContainer.add(fixedTopPanel, BorderLayout.NORTH);
+        mainContainer.add(createMoviesSection(), BorderLayout.CENTER);
+
+        setContentPane(mainContainer);
+
+        txtSearch.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { filterMovies(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { filterMovies(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { filterMovies(); }
+        });
+    }
+
+    private void filterMovies() {
+        String keyword = txtSearch.getText().trim().toLowerCase();
+        movieGrid.removeAll(); 
+
+        if (dsPhimKhoGoc != null) {
+            for (Phim p : dsPhimKhoGoc) {
+                if (p.getTenPhim().toLowerCase().contains(keyword)) {
+                    JPanel card = createMovieCard(p);
+                    card.setPreferredSize(new Dimension(180, 280)); 
+                    movieGrid.add(card);
+                }
+            }
+        }
+        
+        movieGrid.revalidate();
+        movieGrid.repaint();
     }
 
     private BufferedImage loadImage(String path) {
@@ -42,9 +84,8 @@ public class CustomerHome extends JFrame {
             URL imageUrl = getClass().getResource(path);
             if (imageUrl != null) {
                 return ImageIO.read(imageUrl);
-            } else {
-                return null;
             }
+            return null;
         } catch (IOException e) {
             return null;
         }
@@ -64,32 +105,52 @@ public class CustomerHome extends JFrame {
 
         nav.add(createNavLink("Movies", true));
         nav.add(Box.createRigidArea(new Dimension(20, 0)));
-        //nav.add(createNavLink("Marketplace", false));
+        
         JLabel lblMarketplace = createNavLink("Marketplace", false);
         lblMarketplace.addMouseListener(new java.awt.event.MouseAdapter() {
-    @Override
-    public void mouseClicked(java.awt.event.MouseEvent evt) {
-        new MarketplaceView().setVisible(true); // Mở trang Marketplace
-        dispose(); // Đóng trang Home (hoặc giữ lại tùy ní)
-    }
-});
-nav.add(lblMarketplace);
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                new MarketplaceView(currentUsername).setVisible(true); 
+                dispose(); 
+            }
+        });
+        nav.add(lblMarketplace);
         nav.add(Box.createRigidArea(new Dimension(20, 0)));
-        nav.add(createNavLink("My Tickets", false));
-
+        
+        JLabel lblMyTickets = createNavLink("My Tickets", false);
+        lblMyTickets.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                new MyTicketsView(currentUsername).setVisible(true);
+                dispose(); 
+            }
+        });
+        nav.add(lblMyTickets);
         nav.add(Box.createHorizontalGlue());
 
-        JTextField txtSearch = new JTextField(20);
+        txtSearch = new JTextField(20);
         txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Search films, cinemas...");
         txtSearch.putClientProperty(FlatClientProperties.STYLE, "arc: 20; padding: 5,15,5,15");
         txtSearch.setMaximumSize(new Dimension(250, 35));
         nav.add(txtSearch);
         nav.add(Box.createRigidArea(new Dimension(20, 0)));
 
-        JButton btnAccount = new JButton("Account");
-        btnAccount.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
-        nav.add(btnAccount);
-
+        JButton btnLogout = new JButton("Đăng xuất");
+        btnLogout.putClientProperty(FlatClientProperties.STYLE, "arc: 20; borderWidth: 0");
+        btnLogout.setBackground(new Color(220, 53, 69)); 
+        btnLogout.setForeground(Color.WHITE);
+        btnLogout.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnLogout.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        btnLogout.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this, "Xác nhận đăng xuất khỏi hệ thống?", "Đăng xuất", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                dispose();
+                new DangNhapFrame().setVisible(true);
+            }
+        });
+        
+        nav.add(btnLogout);
         return nav;
     }
 
@@ -102,108 +163,94 @@ nav.add(lblMarketplace);
     }
 
     private JPanel createHeroBanner() {
-    JPanel wrapper = new JPanel(new BorderLayout());
-    wrapper.setBackground(new Color(248, 250, 252));
-    wrapper.setBorder(new EmptyBorder(20, 40, 20, 40));
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(new Color(248, 250, 252));
+        wrapper.setBorder(new EmptyBorder(20, 40, 20, 40));
 
-    // Load tấm ảnh chất lượng cao ní vừa kiếm được
-    final BufferedImage bannerImg = loadImage("/images/onepiecebanner.png");
+        final BufferedImage bannerImg = loadImage("/images/onepiecebanner.png");
 
-    JPanel heroBg = new JPanel() {
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            if (bannerImg != null) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                // Bật chế độ làm mịn ảnh cao nhất để không bị bể
-                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
-                int iw = bannerImg.getWidth(this);
-                int ih = bannerImg.getHeight(this);
-                int w = getWidth();
-                int h = getHeight();
+        JPanel heroBg = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (bannerImg != null) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                    g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    
+                    int iw = bannerImg.getWidth(this);
+                    int ih = bannerImg.getHeight(this);
+                    int w = getWidth();
+                    int h = getHeight();
 
-                double sx = (double) w / iw;
-                double sy = (double) h / ih;
-                double s = Math.max(sx, sy);
+                    double sx = (double) w / iw;
+                    double sy = (double) h / ih;
+                    double s = Math.max(sx, sy);
 
-                int nw = (int) (iw * s);
-                int nh = (int) (ih * s);
-                int nx = (w - nw) / 2;
-                int ny = (h - nh) / 2;
+                    int nw = (int) (iw * s);
+                    int nh = (int) (ih * s);
+                    int nx = (w - nw) / 2;
+                    int ny = (h - nh) / 2;
 
-                g2.drawImage(bannerImg, nx, ny, nw, nh, this);
-                g2.dispose();
-            } else {
-                g.setColor(new Color(15, 23, 42));
-                g.fillRect(0, 0, getWidth(), getHeight());
+                    g2.drawImage(bannerImg, nx, ny, nw, nh, this);
+                    g2.dispose();
+                } else {
+                    g.setColor(new Color(15, 23, 42));
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                }
             }
-        }
-    };
-    
-    heroBg.setOpaque(false); 
-    heroBg.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
-    
-    
-    heroBg.setPreferredSize(new Dimension(Integer.MAX_VALUE, 300)); 
+        };
+        
+        heroBg.setOpaque(false); 
+        heroBg.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
+        heroBg.setPreferredSize(new Dimension(Integer.MAX_VALUE, 300)); 
 
-    wrapper.add(heroBg, BorderLayout.CENTER);
-    return wrapper;
-}
-
-private JPanel createMoviesSection() {
-    JPanel section = new JPanel();
-    section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
-    section.setBackground(new Color(248, 250, 252));
-    section.setBorder(new EmptyBorder(0, 40, 40, 40));
-
-    // --- 1. Tiêu đề & Bộ lọc (Giữ nguyên) ---
-    JPanel header = new JPanel();
-    header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
-    header.setOpaque(false);
-    JLabel lblTitle = new JLabel("Current Releases");
-    lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
-    header.add(lblTitle);
-    header.add(Box.createHorizontalGlue());
-    section.add(header);
-    section.add(Box.createRigidArea(new Dimension(0, 20)));
-
-    // --- 2. Container chứa các thẻ phim (GRID) ---
-    // Không dùng GridLayout cố định 5 cột nữa, mà dùng FlowLayout để nó dàn hàng ngang dài vô tận
-    JPanel grid = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
-    grid.setOpaque(false);
-
-    // --- 3. Lấy dữ liệu từ DAO và đổ vào ---
-    PhimDAO phimDao = new PhimDAO();
-    List<Phim> dsPhim = phimDao.getDanhSachPhim();
-
-    for (Phim p : dsPhim) {
-        JPanel card = createMovieCard(p);
-        // Cố định kích thước thẻ phim để nó không bị co giãn khi cuộn
-        card.setPreferredSize(new Dimension(180, 280)); 
-        grid.add(card);
+        wrapper.add(heroBg, BorderLayout.CENTER);
+        return wrapper;
     }
 
-    // --- 4. TẠO THANH CUỘN NGANG (SCROLLPANE) ---
-    JScrollPane scrollPane = new JScrollPane(grid);
-    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER); // Tắt cuộn dọc
-    scrollPane.setBorder(null); // Xóa viền xấu xí
-    scrollPane.setOpaque(false);
-    scrollPane.getViewport().setOpaque(false);
-    
-    // Tăng tốc độ cuộn chuột cho mượt
-    scrollPane.getHorizontalScrollBar().setUnitIncrement(16);
-    
-    // Làm đẹp thanh cuộn theo phong cách FlatLaf (ẩn đi khi không rờ tới)
-    scrollPane.getHorizontalScrollBar().putClientProperty(FlatClientProperties.STYLE, 
-        "trackArc: 999; thumbArc: 999; trackInsets: 3,3,3,3; thumbInsets: 3,3,3,3; hoverTrackColor: #00000000");
+    private JPanel createMoviesSection() {
+        JPanel section = new JPanel();
+        section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
+        section.setBackground(new Color(248, 250, 252));
+        section.setBorder(new EmptyBorder(0, 40, 40, 40));
 
-    section.add(scrollPane);
-    return section;
-}
+        JPanel header = new JPanel();
+        header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
+        header.setOpaque(false);
+        JLabel lblTitle = new JLabel("Current Releases");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        header.add(lblTitle);
+        header.add(Box.createHorizontalGlue());
+        section.add(header);
+        section.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        movieGrid = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
+        movieGrid.setOpaque(false);
+
+        if (dsPhimKhoGoc != null) {
+            for (Phim p : dsPhimKhoGoc) {
+                JPanel card = createMovieCard(p);
+                card.setPreferredSize(new Dimension(180, 280)); 
+                movieGrid.add(card);
+            }
+        }
+
+        JScrollPane scrollPane = new JScrollPane(movieGrid);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER); 
+        scrollPane.setBorder(null); 
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(16);
+        scrollPane.getHorizontalScrollBar().putClientProperty(FlatClientProperties.STYLE, 
+            "trackArc: 999; thumbArc: 999; trackInsets: 3,3,3,3; thumbInsets: 3,3,3,3; hoverTrackColor: #00000000");
+
+        section.add(scrollPane);
+        return section;
+    }
 
     private JPanel createMovieCard(Phim phim) {
         String imagePath = "/images/" + phim.getHinhAnh();
@@ -216,14 +263,12 @@ private JPanel createMoviesSection() {
                 super.paintComponent(g);
                 if (posterImg != null) {
                     Graphics2D g2 = (Graphics2D) g.create();
-                    // THÊM 3 DÒNG NÀY ĐỂ HÌNH KHÔNG BỊ BỂ
-                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
-                // Vẽ ảnh lấp đầy thẻ card
-                g2.drawImage(posterImg, 0, 0, getWidth(), getHeight(), this);
-                g2.dispose();
+                    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                    g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    
+                    g2.drawImage(posterImg, 0, 0, getWidth(), getHeight(), this);
+                    g2.dispose();
                 } else {
                     g.setColor(new Color(71, 85, 105));
                     g.fillRect(0, 0, getWidth(), getHeight());
@@ -234,6 +279,16 @@ private JPanel createMoviesSection() {
         card.setOpaque(false); 
         card.putClientProperty(FlatClientProperties.STYLE, "arc: 15");
         card.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
+        // --- ĐÂY LÀ CHỖ GẮN SỰ KIỆN CLICK ĐỂ CHUYỂN TRANG ---
+        card.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        card.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                new MovieDetailView(currentUsername, phim.getTenPhim(), phim.getHinhAnh()).setVisible(true);
+                dispose();
+            }
+        });
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         topPanel.setOpaque(false);
@@ -257,6 +312,11 @@ private JPanel createMoviesSection() {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new CustomerHome().setVisible(true));
+        // Bật khử răng cưa và cài Font Segoe UI mặc định để màn hình MovieDetailView mượt như hình Figma
+        System.setProperty("awt.useSystemAAFontSettings", "on");
+        System.setProperty("swing.aatext", "true");
+        UIManager.put("defaultFont", new Font("Segoe UI", Font.PLAIN, 14));
+        
+        SwingUtilities.invokeLater(() -> new CustomerHome("Guest_test").setVisible(true));
     }
 }

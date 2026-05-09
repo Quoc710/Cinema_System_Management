@@ -11,6 +11,6 @@ package com.mycompany.cinema_system_management;
 public class Cinema_System_Management {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        
     }
 }

@@ -25,7 +25,7 @@ public class DatabaseConnection {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             // Mở kết nối
             conn = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Kết nối Oracle thành công rồi ní ơi!");
+            System.out.println("Kết nối Oracle thành công");
         } catch (ClassNotFoundException e) {
             System.out.println("Lỗi: Không tìm thấy file ojdbc.jar!");
             e.printStackTrace();
