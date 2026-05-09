@@ -1,12 +1,21 @@
-E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\Cinema_System_Management.java
-E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\DAO\MarketplaceDAO.java
-E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\DAO\PhimDAO.java
-E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\DAO\TaiKhoanDAO.java
-E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\models\Phim.java
-E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\models\TaiKhoan.java
-E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\utils\DatabaseConnection.java
-E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\AdminDashboard.java
-E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\CustomerHome.java
-E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\DangKyFrame.java
-E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\DangNhapFrame.java
-E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\MarketplaceView.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\Cinema_System_Management.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\DAO\GiaoDichDAO.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\DAO\MarketplaceDAO.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\DAO\PhimDAO.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\DAO\TaiKhoanDAO.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\models\GiaoDich.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\models\Phim.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\models\TaiKhoan.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\utils\DatabaseConnection.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\AdminDashboard.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\CustomerHome.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\DangKyFrame.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\DangNhapFrame.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\Header.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\MarketplaceView.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\QuanLyKhoHang.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\QuanLyKhuyenMai.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\QuanLyPhanQuyen.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\QuanLySuatChieu.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\Sidebar.java
+C:\Users\Nguyen Huu Tai\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\StatCard.java

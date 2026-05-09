@@ -15,8 +15,8 @@ import java.sql.SQLException;
 public class DatabaseConnection {
     // Sửa lại thông tin này cho khớp với máy ní nha
     private static final String URL = "jdbc:oracle:thin:@localhost:1521:XE"; // XE hoặc ORCL tùy máy
-    private static final String USER = "BTTHUCHANH_01_IS210"; // Tên user Oracle ní tạo
-    private static final String PASSWORD = "123456"; // Mật khẩu Oracle
+    private static final String USER = "HuuTai"; // Tên user Oracle ní tạo
+    private static final String PASSWORD = "12345"; // Mật khẩu Oracle
 
     public static Connection getConnection() {
         Connection conn = null;
