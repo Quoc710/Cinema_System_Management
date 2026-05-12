@@ -1,4 +1,5 @@
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\Cinema_System_Management.java
+E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\DAO\HoaDonDAO.java
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\DAO\MarketplaceDAO.java
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\DAO\PhimDAO.java
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\DAO\TaiKhoanDAO.java
@@ -11,9 +12,14 @@ E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_sys
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\AdminDashboard.java
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\BookingSeatView.java
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\BookingSnackView.java
+E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\BuyTicketDialog.java
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\CustomerHome.java
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\DangKyFrame.java
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\DangNhapFrame.java
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\MarketplaceView.java
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\MovieDetailView.java
 E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\MyTicketsView.java
+E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\PaymentView.java
+E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\SellTicketDialog.java
+E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\TopUpDialog.java
+E:\NguyenAnhQuoc\Cinema_System_Management\src\main\java\com\mycompany\cinema_system_management\view\WalletHistoryView.java

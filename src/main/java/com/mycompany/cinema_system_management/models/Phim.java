@@ -12,11 +12,11 @@ public class Phim {
     private Date ngayKetThuc;
     private int doTuoi;
     private String hinhAnh;
-    private double diemDanhGia;
+    private String tomTat;
 
     public Phim() {}
 
-    public Phim(int maPhim, String tenPhim, String theLoai, int thoiLuong, String daoDien, Date ngayCongChieu, Date ngayKetThuc, int doTuoi, String hinhAnh, double diemDanhGia) {
+    public Phim(int maPhim, String tenPhim, String theLoai, int thoiLuong, String daoDien, Date ngayCongChieu, Date ngayKetThuc, int doTuoi, String hinhAnh, String tomTat) {
         this.maPhim = maPhim;
         this.tenPhim = tenPhim;
         this.theLoai = theLoai;
@@ -26,7 +26,7 @@ public class Phim {
         this.ngayKetThuc = ngayKetThuc;
         this.doTuoi = doTuoi;
         this.hinhAnh = hinhAnh;
-        this.diemDanhGia = diemDanhGia;
+        this.tomTat = tomTat;
     }
 
     public int getMaPhim() { return maPhim; }
@@ -47,6 +47,7 @@ public class Phim {
     public void setDoTuoi(int doTuoi) { this.doTuoi = doTuoi; }
     public String getHinhAnh() { return hinhAnh; }
     public void setHinhAnh(String hinhAnh) { this.hinhAnh = hinhAnh; }
-    public double getDiemDanhGia() { return diemDanhGia; }
-    public void setDiemDanhGia(double diemDanhGia) { this.diemDanhGia = diemDanhGia; }
+    public String getTomTat() { return tomTat; }
+    public void setTomTat(String tomTat) { this.tomTat = tomTat; }
+    
 }

@@ -126,6 +126,20 @@ public class CustomerHome extends JFrame {
             }
         });
         nav.add(lblMyTickets);
+        nav.add(Box.createRigidArea(new Dimension(20, 0)));
+        
+        // --- THÊM NÚT MY WALLET Ở ĐÂY ---
+        JLabel lblMyWallet = createNavLink("My Wallet", false);
+        lblMyWallet.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                new WalletHistoryView(currentUsername).setVisible(true); // Gắn đúng trang WalletHistoryView
+                dispose(); 
+            }
+        });
+        nav.add(lblMyWallet);
+        // ----------------------------------
+
         nav.add(Box.createHorizontalGlue());
 
         txtSearch = new JTextField(20);
@@ -255,7 +269,8 @@ public class CustomerHome extends JFrame {
     private JPanel createMovieCard(Phim phim) {
         String imagePath = "/images/" + phim.getHinhAnh();
         final BufferedImage posterImg = loadImage(imagePath);
-        String ratingStr = String.format("%.1f / 10", phim.getDiemDanhGia());
+        
+        String ratingStr = phim.getDoTuoi() > 0 ? "T" + phim.getDoTuoi() : "P"; 
 
         JPanel card = new JPanel(new BorderLayout()) {
             @Override
@@ -280,7 +295,6 @@ public class CustomerHome extends JFrame {
         card.putClientProperty(FlatClientProperties.STYLE, "arc: 15");
         card.setBorder(new EmptyBorder(10, 10, 10, 10));
         
-        // --- ĐÂY LÀ CHỖ GẮN SỰ KIỆN CLICK ĐỂ CHUYỂN TRANG ---
         card.setCursor(new Cursor(Cursor.HAND_CURSOR));
         card.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -295,7 +309,8 @@ public class CustomerHome extends JFrame {
         
         JLabel lblRating = new JLabel(" " + ratingStr + " ");
         lblRating.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        lblRating.setBackground(Color.WHITE);
+        lblRating.setBackground(new Color(220, 38, 38)); 
+        lblRating.setForeground(Color.WHITE);
         lblRating.setOpaque(true);
         lblRating.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         
@@ -312,7 +327,6 @@ public class CustomerHome extends JFrame {
     }
 
     public static void main(String[] args) {
-        // Bật khử răng cưa và cài Font Segoe UI mặc định để màn hình MovieDetailView mượt như hình Figma
         System.setProperty("awt.useSystemAAFontSettings", "on");
         System.setProperty("swing.aatext", "true");
         UIManager.put("defaultFont", new Font("Segoe UI", Font.PLAIN, 14));

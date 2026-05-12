@@ -24,13 +24,13 @@ public class BookingSeatView extends JFrame {
     private String hinhAnh;
 
     private List<String> danhSachGheDB; 
+    private List<String> danhSachGheDaDat;
     private List<String> selectedSeatsList = new ArrayList<>(); 
     private int selectedSeatsCount = 0;
     
-    // UI Elements cập nhật realtime
     private JLabel lblTotalValue;
     private JLabel lblTicketCount;
-    private JLabel lblTicketPriceValue; // Đã thêm biến để update giá tiền từng dòng
+    private JLabel lblTicketPriceValue; 
     private JLabel lblMSeats;
     
     private DecimalFormat vndFormat = new DecimalFormat("#,### đ");
@@ -43,6 +43,7 @@ public class BookingSeatView extends JFrame {
         this.hinhAnh = hinhAnh; 
 
         fetchSeatsFromDB();
+        fetchBookedSeats(); // Đã vá lỗi lọc theo suất chiếu
 
         FlatLightLaf.setup();
         setTitle("CineMarket - Select Seats");
@@ -80,6 +81,36 @@ public class BookingSeatView extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Lỗi kết nối Database khi tải ghế!");
+        }
+    }
+
+    // ĐÃ FIX: Lọc ghế đã bán theo đúng Tên Phim + Giờ Chiếu
+    private void fetchBookedSeats() {
+        danhSachGheDaDat = new ArrayList<>();
+        
+        // Cắt lấy giờ chiếu (VD: "13:00 • 2D" -> "13:00")
+        String gioChieu = thongTinSuat;
+        if (gioChieu != null) {
+            if (gioChieu.contains("•")) gioChieu = gioChieu.split("•")[0].trim();
+            else if (gioChieu.contains(" ")) gioChieu = gioChieu.split(" ")[0].trim();
+        }
+
+        String sql = "SELECT G.TENGHE FROM VE V " +
+                     "JOIN GHENGOI G ON V.MAGHE = G.MAGHE " +
+                     "JOIN LICHCHIEU L ON V.MALICHCHIEU = L.MALICHCHIEU " +
+                     "JOIN PHIM P ON L.MAPHIM = P.MAPHIM " +
+                     "WHERE P.TENPHIM = ? AND TO_CHAR(L.TGCHIEU, 'HH24:MI') LIKE ? AND V.TRANGTHAIVE = 1";
+                     
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, this.tenPhim);
+            ps.setString(2, "%" + gioChieu + "%");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                danhSachGheDaDat.add(rs.getString("TENGHE"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -196,9 +227,6 @@ public class BookingSeatView extends JFrame {
         return p;
     }
 
-    // =========================================================
-    // SƠ ĐỒ GHẾ (Đã dọn dẹp sạch sẽ dòng số)
-    // =========================================================
     private JPanel createSeatMapPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
@@ -248,6 +276,9 @@ public class BookingSeatView extends JFrame {
                 
                 if (!danhSachGheDB.contains(tenGheHT)) {
                     btnSeat.setVisible(false);
+                } else if (danhSachGheDaDat.contains(tenGheHT)) {
+                    btnSeat.setEnabled(false);
+                    btnSeat.putClientProperty(FlatClientProperties.STYLE, "arc: 8; background: #E2E8F0; borderColor: #CBD5E1; borderWidth: 1;");
                 } else {
                     btnSeat.setCursor(new Cursor(Cursor.HAND_CURSOR));
                     btnSeat.putClientProperty(FlatClientProperties.STYLE, "arc: 8; background: #FFFFFF; borderColor: #CBD5E1; borderWidth: 1; selectedBackground: #023E8A;");
@@ -328,10 +359,7 @@ public class BookingSeatView extends JFrame {
         JLabel lblPoster = new JLabel();
         lblPoster.setPreferredSize(new Dimension(60, 85));
         
-        // --- CHỖ LOAD ẢNH ---
         try {
-            // Check đường dẫn nếu bị lỗi null
-            System.out.println("Đang tìm ảnh tại: /images/" + hinhAnh);
             URL url = getClass().getResource("/images/" + hinhAnh); 
             if (url != null) {
                 lblPoster.setIcon(new ImageIcon(new ImageIcon(url).getImage().getScaledInstance(60, 85, Image.SCALE_SMOOTH)));
@@ -362,12 +390,11 @@ public class BookingSeatView extends JFrame {
         summaryInner.add(movieInfo);
         summaryInner.add(Box.createVerticalStrut(25));
 
-        // Khởi tạo các label tính tiền
         lblTicketCount = new JLabel("Tickets (0x)");
-        lblTicketPriceValue = new JLabel("0 đ"); // FIX: Đã tạo biến cho giá tiền từng dòng
+        lblTicketPriceValue = new JLabel("0 đ"); 
         lblTotalValue = new JLabel("0 đ"); 
         
-        summaryInner.add(createBillRow(lblTicketCount, lblTicketPriceValue, false)); // FIX: Truyền biến vào đây
+        summaryInner.add(createBillRow(lblTicketCount, lblTicketPriceValue, false)); 
         summaryInner.add(Box.createVerticalStrut(10));
         
         JPanel divider = new JPanel();
@@ -394,8 +421,11 @@ public class BookingSeatView extends JFrame {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn ít nhất 1 ghế để tiếp tục!");
                 return;
             }
-            new BookingSnackView(currentUsername, tenPhim).setVisible(true);
-            dispose();
+            double ticketPriceVND = 110000.0; 
+            double totalVND = selectedSeatsCount * ticketPriceVND;
+            
+            new BookingSnackView(currentUsername, tenPhim, thongTinSuat, selectedSeatsList, totalVND, this).setVisible(true);
+            this.setVisible(false); 
         });
 
         summaryInner.add(btnNext);
@@ -457,7 +487,6 @@ public class BookingSeatView extends JFrame {
         double ticketPriceVND = 110000.0; 
         double totalVND = selectedSeatsCount * ticketPriceVND;
         
-        // Cập nhật giá trị VND cho cả 2 label
         lblTicketPriceValue.setText(vndFormat.format(totalVND)); 
         lblTotalValue.setText(vndFormat.format(totalVND));
         

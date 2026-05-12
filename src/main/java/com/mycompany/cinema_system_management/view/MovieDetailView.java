@@ -52,6 +52,7 @@ public class MovieDetailView extends JFrame {
             this.phimHienTai.setTenPhim(tenPhim);
             this.phimHienTai.setThoiLuong(0);
             this.phimHienTai.setTheLoai("Đang cập nhật");
+            this.phimHienTai.setTomTat("Đang cập nhật tóm tắt...");
         }
 
         FlatLightLaf.setup();
@@ -189,7 +190,7 @@ public class MovieDetailView extends JFrame {
                         String thongTin = timeFormat.format(ts) + " • " + dinhDang;
 
                         // Truyền đầy đủ tham số sang màn hình BookingSeatView
-                        new BookingSeatView(currentUsername, phimHienTai.getTenPhim(), thongTin, tenPhong,phimHienTai.getHinhAnh()).setVisible(true);
+                        new BookingSeatView(currentUsername, phimHienTai.getTenPhim(), thongTin, tenPhong, phimHienTai.getHinhAnh()).setVisible(true);
                         dispose();
                     }
 
@@ -225,20 +226,31 @@ public class MovieDetailView extends JFrame {
         
         scrollContent.add(Box.createVerticalStrut(30));
 
-        // 3. TÓM TẮT PHIM
+        // =====================================================================
+        // 3. TÓM TẮT PHIM (ĐÃ ĐƯỢC CHỈNH SỬA LẤY DATA TỪ DB)
+        // =====================================================================
         JPanel synopsisWrapper = new JPanel(new BorderLayout());
         synopsisWrapper.setOpaque(false);
         synopsisWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
         JLabel lblSynopTitle = new JLabel("Tóm tắt phim");
         lblSynopTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblSynopTitle.setBorder(new EmptyBorder(0, 0, 10, 0));
-        JTextArea txtSynopsis = new JTextArea("Hành trình khám phá kho báu vĩ đại nhất với những màn hải chiến đỉnh cao. Đặt vé ngay để nhận ưu đãi từ CineMarket!");
+        
+        // Kéo dữ liệu từ Object phimHienTai ra
+        String noiDungTomTat = "Nội dung phim đang được cập nhật...";
+        if (phimHienTai != null && phimHienTai.getTomTat() != null && !phimHienTai.getTomTat().trim().isEmpty()) {
+            noiDungTomTat = phimHienTai.getTomTat();
+        }
+
+        JTextArea txtSynopsis = new JTextArea(noiDungTomTat);
         txtSynopsis.setWrapStyleWord(true);
         txtSynopsis.setLineWrap(true);
         txtSynopsis.setEditable(false);
         txtSynopsis.setOpaque(false);
         txtSynopsis.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtSynopsis.setForeground(new Color(71, 85, 105));
+        
         synopsisWrapper.add(lblSynopTitle, BorderLayout.NORTH);
         synopsisWrapper.add(txtSynopsis, BorderLayout.CENTER);
         scrollContent.add(synopsisWrapper);
@@ -246,7 +258,6 @@ public class MovieDetailView extends JFrame {
         return scrollContent;
     }
 
-    // Các hàm Header, LeftPanel, MetaLabel giữ nguyên không đổi
     private JPanel createHeaderPanel() {
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
